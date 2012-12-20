@@ -1,0 +1,10 @@
+
+To install geniePi
+==================
+
+  make
+  sudo make install
+
+To uninstall:
+
+  sudo make uninstall
