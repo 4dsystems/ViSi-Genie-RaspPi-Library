@@ -1,4 +1,17 @@
-ViSi-Genie-RaspPi-Library
-=========================
+![image](http://www.4dsystems.com.au/imagenes/header.png)
 
-ViSi-Genie - Raspberry Pi Library
+ViSi-Genie-RaspPi-Library
+====================
+
+4D Systems Raspberry Pi Library for Visi-Genie
+
+
+## Installation on the Raspberry Pi
+==================
+
+  make
+  sudo make install
+
+To uninstall:
+
+  sudo make uninstall
