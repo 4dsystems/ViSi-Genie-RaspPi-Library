@@ -10,9 +10,9 @@ ViSi-Genie-RaspPi-Library
 ==================
 
   make
-  
   sudo make install
 
-To uninstall:
+## To Uninstall
+==================
 
   sudo make uninstall
