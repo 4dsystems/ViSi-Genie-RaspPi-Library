@@ -10,14 +10,31 @@ Library for the Raspberry Pi to allow easy communication between 4D Intelligent 
 This library is also required for the Raspberry Pi demo programs.
 
 
-## Installation on the Raspberry Pi
-==================
+## Installation of Genie Pi Library on the Raspberry Pi
+=======================================================
 
   make
 
   sudo make install
 
-## To Uninstall
-==================
+## To Uninstall Genie Pi Library
+=================================
 
   sudo make uninstall
+  
+
+## To Install wiringPi library (Required for some applications/demos)
+=====================================================================
+  Connect your raspberry Pi up to the Internet and download WiringPi library from github:
+  
+  
+  cd
+  
+  git clone git://git.drogon.net/wiringPi
+  
+  cd wiringPi
+  
+  ./build
+  
+  
+  This will then download and install the wiringPi library
