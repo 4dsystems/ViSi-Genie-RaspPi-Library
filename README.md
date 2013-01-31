@@ -25,7 +25,7 @@ This library is also required for the Raspberry Pi demo programs.
 
 ## To Install wiringPi library (Required for some applications/demos)
 =====================================================================
-  Connect your raspberry Pi up to the Internet and download WiringPi library from github:
+* Connect your raspberry Pi up to the Internet and download WiringPi library from github:
   
   
   cd
@@ -37,4 +37,27 @@ This library is also required for the Raspberry Pi demo programs.
   ./build
   
   
-  This will then download and install the wiringPi library
+* This will then download and install the wiringPi library
+  
+
+## Disable Linux from using the Pi Serial Port so the GeniePi library can instead
+=================================================================================
+* From terminal, launch leafpad (or your chosen editor) with root:
+
+  sudo leafpad
+
+* Nagivate to /boot/cmdline.txt and remove the following text (LEAVE everything else intact)
+
+  kgdboc=ttyAMA0,115200 console=tty1  
+  
+* Save the file, overwriting the existing one.
+  
+* Navigate and edit /etc/inittab
+  
+* Comment out the bottom line by putting a '#' symbol at the start of it, where the bottom line is:
+  
+  T0:23:respawn:/sbin/getty -L ttyAMA0 115200 vt100
+  
+* Save the file, overwriting the existing one
+  
+* Reboot your Raspberry Pi
