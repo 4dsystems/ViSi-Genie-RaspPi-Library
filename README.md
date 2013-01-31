@@ -38,6 +38,8 @@ This library is also required for the Raspberry Pi demo programs.
   
   
 * This will then download and install the wiringPi library
+
+* Please see here for more detail if above is insufficient (https://projects.drogon.net/raspberry-pi/wiringpi/download-and-install/)
   
 
 ## Disable Linux from using the Pi Serial Port so the GeniePi library can instead
