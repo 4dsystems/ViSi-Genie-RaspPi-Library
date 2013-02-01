@@ -37,9 +37,9 @@ This library is also required for the Raspberry Pi demo programs.
   ./build
   
   
-* This will then download and install the wiringPi library
+* This will then download and install the wiringPi library, assuming you have git installed on your Raspberry Pi already.
 
-* Please see here for more detail if above is insufficient (https://projects.drogon.net/raspberry-pi/wiringpi/download-and-install/)
+* Please see here for more detail if you need to install git also (https://projects.drogon.net/raspberry-pi/wiringpi/download-and-install/)
   
 
 ## Disable Linux from using the Pi Serial Port so the GeniePi library can instead
