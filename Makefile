@@ -41,10 +41,22 @@ CFLAGS	= $(DEBUG) -Wall $(INCLUDE) -Winline -pipe
 
 SRC	=	geniePi.c
 
+
+# Python binding using Swig
+##############################################################################
+
+SWIG_INTERFACE = geniePi.i
+SWIG_WRAP_SRC = geniePi_wrap.c
+SWIG_WRAP_OBJ = $(SWIG_WRAP_SRC:.c=.o)
+SWIG_WRAP = $(SWIG_WRAP_SRC) $(SWIG_WRAP_OBJ)
+SWIG_LIB = _geniePi.so
+SWIG_PYTHON_SRC = geniePi.py
+
+
 # May not need to  alter anything below this line
 ###############################################################################
 
-OBJ	=	$(SRC:.c=.o)
+OBJ = $(SRC:.c=.o)
 
 #all:	$(STATIC)
 all:	$(DYNAMIC)
@@ -63,9 +75,14 @@ $(DYNAMIC):     $(OBJ)
 	@echo [Compile] $<
 	@$(CC) -c $(CFLAGS) $< -o $@
 
+swig:
+	swig -python $(SWIG_INTERFACE)
+	gcc -c $(SRC) $(SWIG_WRAP_SRC) -I/usr/include/python2.7
+	ld -shared $(OBJ) $(SWIG_WRAP_OBJ) -o $(SWIG_LIB)
+
 .PHONEY:	clean
 clean:
-	rm -f $(OBJ) *~ core tags *.bak Makefile.bak libgeniePi.*
+	rm -f $(OBJ) $(SWIG_PYTHON_SRC) $(SWIG_WRAP) $(SWIG_LIB) *~ core tags *.bak Makefile.bak libgeniePi.*
 
 .PHONEY:	tags
 tags:	$(SRC)
