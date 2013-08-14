@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+from setuptools import setup, find_packages
 
 setup(name='geniePi',
       version='1.0',
@@ -9,4 +9,5 @@ setup(name='geniePi',
       author_email='dmichel76@googlemail.com',
       url='https://github.com/dmichel76/ViSi-Genie-RaspPi-Library',
       py_modules=['geniePi'],
+      data_files=[('.',['_geniePi.so'])],
      )
