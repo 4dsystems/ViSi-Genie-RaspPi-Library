@@ -39,6 +39,13 @@ This library is also required for the Raspberry Pi demo programs.
   
 * This will then download and install the wiringPi library, assuming you have git installed on your Raspberry Pi already.
 
+* If you encounter an error such as: error while loading shared libraries: libgeniePi.so: cannot open shared object file: No such file or directory
+do the following:
+
+  sudo ldconfig -v
+
+This should solve the problem
+
 * Please see here for more detail if you need to install git also (https://projects.drogon.net/raspberry-pi/wiringpi/download-and-install/)
   
 
