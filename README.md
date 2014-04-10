@@ -9,12 +9,18 @@ Library for the Raspberry Pi to allow easy communication between 4D Intelligent 
 
 This library is also required for the Raspberry Pi demo programs.
 
+This is C library with a Pythn bindings that uses the compiled shared library.
+
 
 ## Installation of Genie Pi Library on the Raspberry Pi
 =======================================================
 
-  make
+  It is necessary to install swig prior to attempt the installtion as it is the tool used to generate the python binding.
 
+  sudo apt-get install swig
+  
+  make
+  
   sudo make install
 
 ## To Uninstall Genie Pi Library
