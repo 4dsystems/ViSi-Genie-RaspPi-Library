@@ -71,6 +71,18 @@
 #define	GENIE_OBJ_SOUND		22
 #define	GENIE_OBJ_TIMER		23
 
+//June 20, 2014 TIME: 8:30AM PHTIME -->> Added New Objects for Visi-Genie Raspbery Pi Libraries
+#define	GENIE_OBJ_SPECTRUM			24
+#define	GENIE_OBJ_SCOPE				25
+#define	GENIE_OBJ_TANK				26
+#define	GENIE_OBJ_USERIMAGES		27
+#define	GENIE_OBJ_PINOUTPUT			28
+#define	GENIE_OBJ_PININPUT			29
+#define	GENIE_OBJ_4DBUTTON			30
+#define	GENIE_OBJ_ANIBUTTON			31
+#define	GENIE_OBJ_COLORPICKER		32
+#define	GENIE_OBJ_USERBUTTON		33
+
 // Structure to store replys returned from a display
 
 struct genieReplyStruct
