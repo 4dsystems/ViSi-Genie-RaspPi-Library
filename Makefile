@@ -39,12 +39,23 @@ CFLAGS	= $(DEBUG) -Wall $(INCLUDE) -Winline -pipe
 
 #LIBS    = -lpthread
 
-SRC	=	geniePi.c
+SRC	= geniePi.c
+
+# Python binding using Swig
+##############################################################################
+
+SWIG_INTERFACE = geniePi.i
+SWIG_WRAP_SRC = geniePi_wrap.c
+SWIG_WRAP_OBJ = $(SWIG_WRAP_SRC:.c=.o)
+SWIG_WRAP = $(SWIG_WRAP_SRC) $(SWIG_WRAP_OBJ)
+SWIG_LIB = _geniePi.so
+SWIG_PYTHON_SRC = geniePi.py
+
 
 # May not need to  alter anything below this line
 ###############################################################################
 
-OBJ	=	$(SRC:.c=.o)
+OBJ = $(SRC:.c=.o)
 
 #all:	$(STATIC)
 all:	$(DYNAMIC)
@@ -55,7 +66,7 @@ $(STATIC):	$(OBJ)
 	@ranlib $(STATIC)
 #	@size   $(STATIC)
 
-$(DYNAMIC):     $(OBJ)
+$(DYNAMIC):	$(OBJ) swig
 	@echo "[Link (Dynamic)]"
 	@$(CC) -shared -Wl,-soname,libgeniePi.so -o libgeniePi.so -lpthread $(OBJ)
 
@@ -63,9 +74,16 @@ $(DYNAMIC):     $(OBJ)
 	@echo [Compile] $<
 	@$(CC) -c $(CFLAGS) $< -o $@
 
+swig:
+	@echo "Making Python bindings"
+	swig -python $(SWIG_INTERFACE)
+	gcc -c $(SRC) $(SWIG_WRAP_SRC) -I/usr/include/python2.7
+	ld -shared $(OBJ) $(SWIG_WRAP_OBJ) -o $(SWIG_LIB)
+
 .PHONEY:	clean
 clean:
-	rm -f $(OBJ) *~ core tags *.bak Makefile.bak libgeniePi.*
+	rm -rf $(OBJ) $(SWIG_PYTHON_SRC) $(SWIG_WRAP) $(SWIG_LIB) *~ core tags *.bak Makefile.bak libgeniePi.* build
+
 
 .PHONEY:	tags
 tags:	$(SRC)
@@ -84,6 +102,7 @@ install:	$(TARGET)
 	@install -m 0644 geniePi.h     $(DESTDIR)$(PREFIX)/include
 #	@install -m 0755 libgeniePi.a  $(DESTDIR)$(PREFIX)/lib
 	@install -m 0755 libgeniePi.so $(DESTDIR)$(PREFIX)/lib
+	python setup.py install
 
 .PHONEY:	uninstall
 uninstall:
