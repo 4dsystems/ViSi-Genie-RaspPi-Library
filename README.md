@@ -70,3 +70,9 @@ This should solve the problem
 * Save the file, overwriting the existing one
   
 * Reboot your Raspberry Pi
+
+
+## Questions/Issues?
+
+Please sign up for our Forum and ask a question there, or submit a Tech Support Ticket from our website.
+http://forum.4dsystems.com.au or http://www.4dsystems.com.au/support
