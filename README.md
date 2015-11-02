@@ -9,6 +9,12 @@ Library for the Raspberry Pi to allow easy communication between 4D Intelligent 
 
 This library is also required for the Raspberry Pi demo programs.
 
+## Genie Pi version 1.1 
+=======================================================
+*	Added Magic Bytes and Magic Double Bytes Functions
+* 	Added additional Struct : 
+		genieMagicReplyStruct :	cmd, index, length, data[100]	
+
 
 ## Installation of Genie Pi Library on the Raspberry Pi
 =======================================================

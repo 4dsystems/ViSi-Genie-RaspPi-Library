@@ -33,43 +33,48 @@
 #define	GENIE_ACK		0x06
 #define	GENIE_NAK		0x15
 
-#define	GENIE_READ_OBJ		0
-#define	GENIE_WRITE_OBJ		1
-#define	GENIE_WRITE_STR		2
-#define	GENIE_WRITE_STRU	3
-#define	GENIE_WRITE_CONTRAST	4
-#define	GENIE_REPORT_OBJ	5
-#define	GENIE_REPORT_EVENT	7
+#define	GENIE_READ_OBJ				0
+#define	GENIE_WRITE_OBJ				1
+#define	GENIE_WRITE_STR				2
+#define	GENIE_WRITE_STRU			3
+#define	GENIE_WRITE_CONTRAST		4
+#define	GENIE_REPORT_OBJ			5
+#define	GENIE_REPORT_EVENT			7
+#define GENIE_MAGIC_BYTES			8
+#define GENIE_DOUBLE_BYTES 			9
+#define GENIE_REPORT_MAGIC_BYTES  	10
+#define GENIE_REPORT_DOUBLE_BYTES	11
+
 
 // Objects
 //	the manual says:
 //		Note: Object IDs may change with future releases; it is not
 //		advisable to code their values as constants.
 
-#define	GENIE_OBJ_DIPSW		 0
-#define	GENIE_OBJ_KNOB		 1
-#define	GENIE_OBJ_ROCKERSW	 2
-#define	GENIE_OBJ_ROTARYSW	 3
-#define	GENIE_OBJ_SLIDER	 4
-#define	GENIE_OBJ_TRACKBAR	 5
-#define	GENIE_OBJ_WINBUTTON	 6
-#define	GENIE_OBJ_ANGULAR_METER	 7
-#define	GENIE_OBJ_COOL_GAUGE	 8
-#define	GENIE_OBJ_CUSTOM_DIGITS	 9
-#define	GENIE_OBJ_FORM		10
-#define	GENIE_OBJ_GAUGE		11
-#define	GENIE_OBJ_IMAGE		12
-#define	GENIE_OBJ_KEYBOARD	13
-#define	GENIE_OBJ_LED		14
-#define	GENIE_OBJ_LED_DIGITS	15
-#define	GENIE_OBJ_METER		16
-#define	GENIE_OBJ_STRINGS	17
-#define	GENIE_OBJ_THERMOMETER	18
-#define	GENIE_OBJ_USER_LED	19
-#define	GENIE_OBJ_VIDEO		20
-#define	GENIE_OBJ_STATIC_TEXT	21
-#define	GENIE_OBJ_SOUND		22
-#define	GENIE_OBJ_TIMER		23
+#define	GENIE_OBJ_DIPSW		 		0
+#define	GENIE_OBJ_KNOB		 		1
+#define	GENIE_OBJ_ROCKERSW	 		2
+#define	GENIE_OBJ_ROTARYSW	 		3		
+#define	GENIE_OBJ_SLIDER	 		4
+#define	GENIE_OBJ_TRACKBAR			5
+#define	GENIE_OBJ_WINBUTTON	 		6
+#define	GENIE_OBJ_ANGULAR_METER		7
+#define	GENIE_OBJ_COOL_GAUGE		8
+#define	GENIE_OBJ_CUSTOM_DIGITS		9
+#define	GENIE_OBJ_FORM				10
+#define	GENIE_OBJ_GAUGE				11
+#define	GENIE_OBJ_IMAGE				12
+#define	GENIE_OBJ_KEYBOARD			13
+#define	GENIE_OBJ_LED				14
+#define	GENIE_OBJ_LED_DIGITS		15
+#define	GENIE_OBJ_METER				16
+#define	GENIE_OBJ_STRINGS			17
+#define	GENIE_OBJ_THERMOMETER		18
+#define	GENIE_OBJ_USER_LED			19
+#define	GENIE_OBJ_VIDEO				20
+#define	GENIE_OBJ_STATIC_TEXT		21
+#define	GENIE_OBJ_SOUND				22
+#define	GENIE_OBJ_TIMER				23
 
 //June 20, 2014 TIME: 8:30AM PHTIME -->> Added New Objects for Visi-Genie Raspbery Pi Libraries
 #define	GENIE_OBJ_SPECTRUM			24
@@ -93,6 +98,17 @@ struct genieReplyStruct
   unsigned int data ;
 } ;
 
+// Structure to store replys returned from a display
+
+struct genieMagicReplyStruct
+{
+  int cmd ;
+  int index ;
+  int length ;
+  unsigned int data[100] ;
+} ;
+
+
 // Globals (for debugging, mostly)
 
 #ifdef	GENIE_DEBUG
@@ -110,13 +126,16 @@ extern int genieNak ;
 extern "C" {
 #endif
 
-extern int  genieReplyAvail    (void) ;
-extern void genieGetReply      (struct genieReplyStruct *reply) ;
+extern int  genieReplyAvail    		(void) ;
 
-extern int  genieReadObj       (int object, int index) ;
-extern int  genieWriteObj      (int object, int index, unsigned int data) ;
-extern int  genieWriteContrast (int value) ;
-extern int  genieWriteStr      (int index, char *string) ;
+extern void genieGetReply      		(struct genieReplyStruct *reply) ;
+
+extern int  genieReadObj       		(int object, int index) ;
+extern int  genieWriteObj      		(int object, int index, unsigned int data) ;
+extern int  genieWriteContrast 		(int value) ;
+extern int  genieWriteStr      		(int index, char *string) ;
+extern int  genieWriteMagicBytes	(int magic_index, unsigned int *byteArray) ;
+extern int  genieWriteDoubleBytes	(int magic_index, unsigned int *doubleByteArray) ;
 
 extern int  genieSetup         (char *device, int baud) ;
 extern void genieClose         (void) ;

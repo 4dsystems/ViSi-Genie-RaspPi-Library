@@ -54,6 +54,7 @@
 #define	MAX_GENIE_REPLYS	16
 
 static struct genieReplyStruct genieReplys [MAX_GENIE_REPLYS] ;
+static struct genieMagicReplyStruct genieMagicReplys [MAX_GENIE_REPLYS] ;
 static int genieReplysHead = 0 ;
 static int genieReplysTail = 0 ;
 
@@ -264,7 +265,7 @@ static int genieGetchar (void)
  */
 
 static void geniePutchar (int data)
-{
+{  
   unsigned char c = (unsigned char)data ;
   write (genieFd, &c, 1) ;
 }
@@ -282,10 +283,12 @@ static void *genieReplyListener (void *data)
   struct sched_param sched ;
   int pri = 20 ;
 
-  unsigned int cmd, object, index, msb, lsb, csum ;
+  unsigned int cmd, object, index, msb=0, lsb=0, csum ;
+  unsigned int totalLength = 0, readLength;
+  unsigned int byteData[100];
   struct genieReplyStruct *reply ;
+  struct genieMagicReplyStruct *magicByteReply ;  
   int next ;
-
 
 // Set to a real-time priority
 
@@ -313,32 +316,83 @@ static void *genieReplyListener (void *data)
       { genieAck = TRUE ; continue ; }
     if (cmd == GENIE_NAK)
       { genieNak = TRUE ; continue ; }
-
+	  	  
     csum  = cmd ;
-
     if ((object = genieGetchar ()) == -1) { ++genieTimeouts ; continue ; } ; csum ^= object ;
     if ((index  = genieGetchar ()) == -1) { ++genieTimeouts ; continue ; } ; csum ^= index ;
-    if ((msb    = genieGetchar ()) == -1) { ++genieTimeouts ; continue ; } ; csum ^= msb ;
-    if ((lsb    = genieGetchar ()) == -1) { ++genieTimeouts ; continue ; } ; csum ^= lsb ;
-
+	
+	// Check if data received is for magic bytes. If not proceed to normal process in 'else' routine
+	if(cmd == GENIE_REPORT_MAGIC_BYTES || cmd == GENIE_REPORT_DOUBLE_BYTES)
+	{			
+		// total receivable bytes for Double Byte is twice the length specified
+		totalLength = index;
+		if(cmd == GENIE_REPORT_DOUBLE_BYTES) totalLength = index * 2;
+		
+		for(readLength = 0; readLength < totalLength; readLength ++)
+		{
+			if ((byteData[readLength]  = genieGetchar ()) == -1) { ++genieTimeouts ; continue ; } ; csum ^= byteData[readLength] ;
+		}		
+	}
+	
+	else
+	{		
+		if ((msb    = genieGetchar ()) == -1) { ++genieTimeouts ; continue ; } ; csum ^= msb ;
+		if ((lsb    = genieGetchar ()) == -1) { ++genieTimeouts ; continue ; } ; csum ^= lsb ;
+	}
+	
+	// Check resulting checksum value and compare with received checksum byte
+	
     if (genieGetchar () != csum)
     {
       ++genieChecksumErrors ;
       continue ;
     }
 
-// We have valid data - store it into the buffer
-
+	// We have valid data - store it into the buffer
     next = (genieReplysHead + 1) & (MAX_GENIE_REPLYS - 1) ;
-    if (next != genieReplysTail)			// Discard rather than overflow
-    {
-      reply = &genieReplys [genieReplysHead] ;
-      reply->cmd    = cmd ;
-      reply->object = object ;
-      reply->index  = index ;
-      reply->data   = msb << 8 | lsb ;
-      genieReplysHead = next ;
-    }
+	
+	
+	if(cmd == GENIE_REPORT_MAGIC_BYTES || cmd == GENIE_REPORT_DOUBLE_BYTES)
+	{	
+		if (next != genieReplysTail)			// Discard rather than overflow
+		{
+		  magicByteReply 		  = &genieMagicReplys[genieReplysHead] ;
+		  magicByteReply->cmd     = cmd ;
+		  magicByteReply->index   = object ;	
+		  magicByteReply->length  = index ;	
+		  		  
+		  if(cmd == GENIE_REPORT_MAGIC_BYTES)
+		  {			  
+			  for(readLength = 0; readLength < totalLength; readLength ++)
+				{
+					magicByteReply->data[readLength]   = byteData[readLength];
+				}  
+		  }
+		  
+		  if(cmd == GENIE_REPORT_DOUBLE_BYTES)
+		  {			  
+			  for(readLength = 1; readLength < totalLength; readLength ++)
+				{
+					magicByteReply->data[readLength]   = byteData[readLength * 2] << 8 | byteData[(readLength * 2) + 1];
+				}  
+		  }
+		  	  
+		  genieReplysHead 		  = next ;
+		}
+	}
+	
+	else
+	{
+		if (next != genieReplysTail)			// Discard rather than overflow
+			{
+			  reply 		= &genieReplys [genieReplysHead] ;
+			  reply->cmd    = cmd ;
+			  reply->object = object ;
+			  reply->index  = index ;
+			  reply->data   = msb << 8 | lsb ;			 
+			  genieReplysHead = next ;
+			}
+	}	
   }
 
   return (void *)NULL ;
@@ -373,7 +427,6 @@ void genieGetReply (struct genieReplyStruct *reply)
 
   genieReplysTail = (genieReplysTail + 1) & (MAX_GENIE_REPLYS - 1) ;
 }
-
 
 /*
  * genieReadObj:
@@ -598,6 +651,106 @@ int genieWriteStrU (int index, char *string)
 
   pthread_mutex_lock   (&genieMutex) ;
     result = _genieWriteStrU (index, string) ;
+  pthread_mutex_unlock (&genieMutex) ;
+
+  return result ;
+}
+
+
+
+/*
+ * genieWriteMagicBytes:
+ *	Write a byte array to the display.
+ *	There is only one byte per index in array.
+ *********************************************************************************
+ */
+ 
+static int  _genieWriteMagicBytes	(int magic_index, unsigned int *byteArray)
+{
+	unsigned int *p ;
+	unsigned int checksum ;
+	int len = sizeof(byteArray) / sizeof(byteArray[0]);
+
+	if (len > 255)
+		return -1 ;
+
+	genieAck = genieNak = FALSE ;
+
+	geniePutchar (GENIE_MAGIC_BYTES) ; 		checksum  = GENIE_MAGIC_BYTES ;
+	geniePutchar (magic_index) ;          	checksum ^= magic_index ;
+	geniePutchar ((unsigned char)len) ; 	checksum ^= len ;
+	for (p = byteArray ; *p ; ++p)
+	{
+		geniePutchar (*p) ;
+		checksum ^= *p ;
+	}
+	geniePutchar (checksum) ;
+
+	// TODO: Really ought to timeout here, but if the display doesn't
+	//	respond, then it's probably game over anyway.
+
+	while ((genieAck == FALSE) && (genieNak == FALSE))
+		delay (1) ;
+
+	return 0 ;
+}
+
+int  genieWriteMagicBytes	(int magic_index,unsigned int *byteArray)
+{
+  int result ;
+
+  pthread_mutex_lock   (&genieMutex) ;
+    result = _genieWriteMagicBytes (magic_index, byteArray) ;
+  pthread_mutex_unlock (&genieMutex) ;
+
+  return result ;
+}
+
+
+/*
+ * genieWriteDoubleBytes:
+ *	Write a double byte array to the display.
+ *	There are two bytes per index in array.
+ *********************************************************************************
+ */
+static int  _genieWriteDoubleBytes	(int magic_index,unsigned int *doubleByteArray)
+{
+	unsigned int *p ;
+	unsigned int checksum ;
+	int len = sizeof (doubleByteArray) / sizeof(doubleByteArray[0]);
+
+	if (len > 255)
+		return -1 ;
+
+	genieAck = genieNak = FALSE ;
+
+	geniePutchar (GENIE_DOUBLE_BYTES) ;		checksum  = GENIE_MAGIC_BYTES ;
+	geniePutchar (magic_index) ;          	checksum ^= magic_index ;
+	geniePutchar ((unsigned char)len) ; 	checksum ^= len ;
+	for (p = doubleByteArray ; *p ; ++p)
+	{
+		geniePutchar ((*p) >> 8) ;
+		checksum ^= (*p) >>  8 ;
+		geniePutchar ((*p) &0xFF) ;
+		checksum ^= (*p) &0xFF ;
+	}
+	geniePutchar (checksum) ;
+
+	// TODO: Really ought to timeout here, but if the display doesn't
+	//	respond, then it's probably game over anyway.
+
+	while ((genieAck == FALSE) && (genieNak == FALSE))
+		delay (1) ;
+
+	return 0 ;
+}
+
+int  genieWriteDoubleBytes	(int magic_index,unsigned int *doubleByteArray)
+{
+  int result ;
+
+  pthread_mutex_lock   (&genieMutex) ;
+    result = _genieWriteDoubleBytes (magic_index, doubleByteArray) ;
   pthread_mutex_unlock (&genieMutex) ;
 
   return result ;

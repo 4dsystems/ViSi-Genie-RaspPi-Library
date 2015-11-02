@@ -84,7 +84,7 @@ install:	$(TARGET)
 	@install -m 0644 geniePi.h     $(DESTDIR)$(PREFIX)/include
 #	@install -m 0755 libgeniePi.a  $(DESTDIR)$(PREFIX)/lib
 	@install -m 0755 libgeniePi.so $(DESTDIR)$(PREFIX)/lib
-
+	@ldconfig
 .PHONEY:	uninstall
 uninstall:
 	@echo "[Un-Install]"
