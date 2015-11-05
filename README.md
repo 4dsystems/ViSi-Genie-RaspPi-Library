@@ -9,12 +9,28 @@ Library for the Raspberry Pi to allow easy communication between 4D Intelligent 
 
 This library is also required for the Raspberry Pi demo programs.
 
+## Genie Pi version 1.2 
+=======================================================
+*	Added the following function:
+
+	genieWriteStrHex	(int index, long n)
+	genieWriteStrDec	(int index, long n)
+	genieWriteStrOct	(int index, long n)
+	genieWriteStrBin	(int index, long n)
+	genieWriteStrBase	(int index, long n, int base)
+	genieWriteStrFloat	(int index, float n, int precision)
+	
 ## Genie Pi version 1.1 
 =======================================================
-*	Added Magic Bytes and Magic Double Bytes Functions
+*	Added the following function:	
+	genieWriteMagicBytes	(int magic_index, unsigned int *byteArray) 
+	genieWriteDoubleBytes	(int magic_index, unsigned int *doubleByteArray)
+	
 * 	Added additional Struct : 
 		genieMagicReplyStruct :	cmd, index, length, data[100]	
 
+		
+		
 
 ## Installation of Genie Pi Library on the Raspberry Pi
 =======================================================

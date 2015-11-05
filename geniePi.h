@@ -88,6 +88,7 @@
 #define	GENIE_OBJ_COLORPICKER		32
 #define	GENIE_OBJ_USERBUTTON		33
 
+
 // Structure to store replys returned from a display
 
 struct genieReplyStruct
@@ -134,6 +135,14 @@ extern int  genieReadObj       		(int object, int index) ;
 extern int  genieWriteObj      		(int object, int index, unsigned int data) ;
 extern int  genieWriteContrast 		(int value) ;
 extern int  genieWriteStr      		(int index, char *string) ;
+
+extern int  genieWriteStrHex 		(int index, long n);
+extern int  genieWriteStrDec 		(int index, long n);
+extern int  genieWriteStrOct 		(int index, long n);
+extern int  genieWriteStrBin 		(int index, long n);
+extern int  genieWriteStrBase 		(int index, long n, int base);
+extern int  genieWriteStrFloat 		(int index, float n, int precision);
+
 extern int  genieWriteMagicBytes	(int magic_index, unsigned int *byteArray) ;
 extern int  genieWriteDoubleBytes	(int magic_index, unsigned int *doubleByteArray) ;
 

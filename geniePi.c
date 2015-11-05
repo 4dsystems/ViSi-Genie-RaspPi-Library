@@ -31,6 +31,7 @@
 #include <termios.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <float.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -81,7 +82,6 @@ static int genieFd = -1;
  *	port parameters - or as many as are required - hopefully!
  *********************************************************************************
  */
-
 static int genieOpen (char *device, int baud)
 {
   struct termios options ;
@@ -156,7 +156,6 @@ static int genieOpen (char *device, int baud)
  *	Flush the serial buffers (both tx & rx)
  *********************************************************************************
  */
-
 static void genieFlush (int fd)
 {
   tcflush (fd, TCIOFLUSH) ;
@@ -168,7 +167,6 @@ static void genieFlush (int fd)
  *	Release the serial port and any other data we have.
  *********************************************************************************
  */
-
 void genieClose (void)
 {
   close (genieFd) ;
@@ -180,7 +178,6 @@ void genieClose (void)
  *	Return the number of bytes of data avalable to be read in the serial port
  *********************************************************************************
  */
-
 static int genieDataAvail (int fd)
 {
   int result ;
@@ -196,7 +193,6 @@ static int genieDataAvail (int fd)
  * Support timing functions. These are based on those in wiringPi
  *********************************************************************************
  */
-
 static unsigned long long epoch ;
 
 static unsigned int millis (void)
@@ -238,7 +234,6 @@ static void delayMicroseconds (unsigned int howLong)
  *	avalable in 5mS.
  *********************************************************************************
  */
-
 static int genieGetchar (void)
 {
   unsigned int timeUp = millis () + 5 ;
@@ -263,7 +258,6 @@ static int genieGetchar (void)
  *	Send a single character (byte) to the Genie display
  *********************************************************************************
  */
-
 static void geniePutchar (int data)
 {  
   unsigned char c = (unsigned char)data ;
@@ -277,7 +271,6 @@ static void geniePutchar (int data)
  *	messages, and store them in the message queue
  *********************************************************************************
  */
-
 static void *genieReplyListener (void *data)
 {
   struct sched_param sched ;
@@ -404,7 +397,6 @@ static void *genieReplyListener (void *data)
  *	Return TRUE if there are pending messages from the display
  *********************************************************************************
  */
-
 int genieReplyAvail (void)
 {
   return (genieReplysHead != genieReplysTail) ;
@@ -417,7 +409,6 @@ int genieReplyAvail (void)
  *	wait until a message has been sent from the display
  *********************************************************************************
  */
-
 void genieGetReply (struct genieReplyStruct *reply)
 {
   while (!genieReplyAvail ())
@@ -433,7 +424,6 @@ void genieGetReply (struct genieReplyStruct *reply)
  *	Send a read object command to the Genie display and get the result back
  *********************************************************************************
  */
-
 static int _genieReadObj (int object, int index)
 {
   struct genieReplyStruct reply ;
@@ -472,7 +462,6 @@ static int _genieReadObj (int object, int index)
 
   return -1 ;
 }
-
 int genieReadObj (int object, int index)
 {
   int result ;
@@ -491,7 +480,6 @@ int genieReadObj (int object, int index)
  *	Write data to an object on the display
  *********************************************************************************
  */
-
 static int _genieWriteObj (int object, int index, unsigned int data)
 {
   unsigned int checksum, msb, lsb ;
@@ -516,7 +504,6 @@ static int _genieWriteObj (int object, int index, unsigned int data)
 
   return 0 ;
 }
-
 int genieWriteObj (int object, int index, unsigned int data)
 {
   int result ;
@@ -534,7 +521,6 @@ int genieWriteObj (int object, int index, unsigned int data)
  *	Alter the display contrast (backlight)
  *********************************************************************************
  */
-
 static int _genieWriteContrast (int value)
 {
   unsigned int checksum ;
@@ -553,7 +539,6 @@ static int _genieWriteContrast (int value)
 
   return 0 ;
 }
-
 int genieWriteContrast (int value)
 {
   int result ;
@@ -567,12 +552,10 @@ int genieWriteContrast (int value)
 
 /*
  * genieWriteStr:
- * genieWriteStrU:
  *	Write a string to the display (ASCII, or Unicode)
  *	There is only one string type object.
  *********************************************************************************
  */
-
 static int _genieWriteStr (int index, char *string)
 {
   char *p ;
@@ -602,38 +585,6 @@ static int _genieWriteStr (int index, char *string)
 
   return 0 ;
 }
-
-static int _genieWriteStrU (int index, char *string)
-{
-  char *p ;
-  unsigned int checksum ;
-  int len = strlen (string) ;
-
-  if (len > 255)
-    return -1 ;
-
-  genieAck = genieNak = FALSE ;
-
-  geniePutchar (GENIE_WRITE_STRU) ;   checksum  = GENIE_WRITE_STRU ;
-  geniePutchar (index) ;              checksum ^= index ;
-  geniePutchar ((unsigned char)len) ; checksum ^= len ;
-  for (p = string ; *p ; ++p)
-  {
-    geniePutchar (*p) ;
-    checksum ^= *p ;
-  }
-  geniePutchar (checksum) ;
-
-// TODO: Really ought to timeout here, but if the display doesn't
-//	respond, then it's probably game over anyway.
-
-  while ((genieAck == FALSE) && (genieNak == FALSE))
-    delay (1) ;
-
-  return 0 ;
-}
-
-
 int genieWriteStr (int index, char *string)
 {
   int result ;
@@ -645,6 +596,43 @@ int genieWriteStr (int index, char *string)
   return result ;
 }
 
+/*
+ * genieWriteStrU:
+ *	Write a string to the display (ASCII, or Unicode)
+ *	There is only one string type object.
+ *********************************************************************************
+ */
+static int _genieWriteStrU (int index, char *string)
+{
+  char *p ;
+  unsigned int checksum ;
+  int len = strlen (string) ;
+  
+
+  if (len > 255)
+    return -1 ;
+
+  genieAck = genieNak = FALSE ;
+
+  geniePutchar (GENIE_WRITE_STRU) ;   checksum  = GENIE_WRITE_STRU ;
+  geniePutchar (index) ;              checksum ^= index ;
+  geniePutchar ((unsigned char)len) ; checksum ^= len ;
+  for (p = string ; *p ; ++p)
+  {
+    geniePutchar ((*p)>> 8);		  checksum ^= ((*p) >> 8) ;
+	geniePutchar ((*p)&0xFF);	      checksum ^= ((*p)&0xFF) ;
+  }
+  
+  geniePutchar (checksum) ;
+
+// TODO: Really ought to timeout here, but if the display doesn't
+//	respond, then it's probably game over anyway.
+
+  while ((genieAck == FALSE) && (genieNak == FALSE))
+    delay (1) ;
+
+  return 0 ;
+}
 int genieWriteStrU (int index, char *string)
 {
   int result ;
@@ -656,6 +644,94 @@ int genieWriteStrU (int index, char *string)
   return result ;
 }
 
+/*
+ * genieWriteStrD:
+ *	Write a decimal value to the display (ASCII)
+ *	There is only one string type object.
+ *********************************************************************************
+ */
+static int _genieMakeStr (int index, long n, int base)
+{
+	char buf[8 * sizeof(long) + 1]; // Assumes 8-bit chars plus zero byte.
+	char *str = &buf[sizeof(buf) - 1];			
+	int  neg = 0;
+	if(n < 0) neg = 1;
+	n = abs(n);
+
+	*str = '\0';			
+	do {
+		unsigned long m = n;
+		n /= base;
+		char c = m - base * n;
+		*--str = c < 10 ? c + '0' : c + 'A' - 10;				
+	} while(n);
+	if(neg) *--str = '-';		
+	_genieWriteStr (index,str);	
+  return 0 ;
+}
+int genieWriteStrHex (int index, long n)
+{
+  int result ;
+  pthread_mutex_lock   (&genieMutex) ;
+    result = _genieMakeStr (index, n, 16);
+  pthread_mutex_unlock (&genieMutex) ;
+  return result ;
+}
+int genieWriteStrOct (int index, long n)
+{
+  int result ;
+  pthread_mutex_lock   (&genieMutex) ;
+    result = _genieMakeStr (index, n, 8);
+  pthread_mutex_unlock (&genieMutex) ;
+  return result ;
+}
+int genieWriteStrBin (int index, long n)
+{
+  int result ;
+  pthread_mutex_lock   (&genieMutex) ;
+    result = _genieMakeStr (index, n, 2);
+  pthread_mutex_unlock (&genieMutex) ;
+  return result ;
+}
+int genieWriteStrBase (int index, long n, int base)
+{
+  int result ;
+  pthread_mutex_lock   (&genieMutex) ;
+    result = _genieMakeStr (index, n, base);
+  pthread_mutex_unlock (&genieMutex) ;
+  return result ;
+}
+int genieWriteStrDec (int index, long n)
+{
+
+  int result ;
+  pthread_mutex_lock   (&genieMutex) ;
+    result = _genieMakeStr (index, n, 10);
+  pthread_mutex_unlock (&genieMutex) ;
+  return result ;
+}
+
+/*
+ * genieWriteStrFloat:
+ *	Write a float string to the display.
+ *	There is only one byte per index in array.
+ *********************************************************************************
+ */
+static int _genieWriteStrFloat (int index, float n, int precision)
+{  
+  char str[sizeof(long)];
+  gcvt(n, precision, str);  
+  _genieWriteStr(index, str);
+  return 0;
+}
+int genieWriteStrFloat (int index, float n, int precision)
+{  
+  int result ;
+  pthread_mutex_lock   (&genieMutex) ;
+     result = _genieWriteStrFloat (index,n,precision);
+  pthread_mutex_unlock (&genieMutex) ;
+  return result ;
+}
 
 
 /*
@@ -664,7 +740,6 @@ int genieWriteStrU (int index, char *string)
  *	There is only one byte per index in array.
  *********************************************************************************
  */
- 
 static int  _genieWriteMagicBytes	(int magic_index, unsigned int *byteArray)
 {
 	unsigned int *p ;
@@ -694,7 +769,6 @@ static int  _genieWriteMagicBytes	(int magic_index, unsigned int *byteArray)
 
 	return 0 ;
 }
-
 int  genieWriteMagicBytes	(int magic_index,unsigned int *byteArray)
 {
   int result ;
@@ -705,7 +779,6 @@ int  genieWriteMagicBytes	(int magic_index,unsigned int *byteArray)
 
   return result ;
 }
-
 
 /*
  * genieWriteDoubleBytes:
@@ -744,7 +817,6 @@ static int  _genieWriteDoubleBytes	(int magic_index,unsigned int *doubleByteArra
 
 	return 0 ;
 }
-
 int  genieWriteDoubleBytes	(int magic_index,unsigned int *doubleByteArray)
 {
   int result ;
@@ -757,13 +829,11 @@ int  genieWriteDoubleBytes	(int magic_index,unsigned int *doubleByteArray)
 }
 
 
-
 /*
  * genieSetup:
  *	Initialise the Genie Display system
  *********************************************************************************
  */
-
 int genieSetup (char *device, int baud)
 {
   int i ;
