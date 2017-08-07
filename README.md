@@ -73,25 +73,24 @@ This should solve the problem
 
 ## Disable Linux from using the Pi Serial Port so the GeniePi library can instead
 =================================================================================
-* From terminal, launch leafpad (or your chosen editor) with root:
+* In a default install of Raspbian, the primary UART (serial0) is assigned to the Linux console. Using the serial port for other purposes requires this default behavour to be changed. On startup, systemd checks the Linux Kernal command line for any console entries, and will use the console defined therein. To stop this behavour, the serial console setting needs to be removed from the command line.
+* This can be done by using the raspi-config utility, or manually.
 
-  sudo leafpad
+sudo raspi-config
 
-* Nagivate to /boot/cmdline.txt and remove the following text (LEAVE everything else intact)
+* Select option 5, interfacing options, then option P6, Serial, and then select No. Exit Raspi-config.
 
-  kgdboc=ttyAMA0,115200 console=tty1  
-  
-* Save the file, overwriting the existing one.
-  
-* Navigate and edit /etc/inittab
-  
-* Comment out the bottom line by putting a '#' symbol at the start of it, where the bottom line is:
-  
-  T0:23:respawn:/sbin/getty -L ttyAMA0 115200 vt100
-  
-* Save the file, overwriting the existing one
-  
-* Reboot your Raspberry Pi
+* To manually change the settings, edit the kernel command line with:
+
+sudo nano /boot/cmdline.txt
+
+* Find the console entry the refers to the serial0 device, and remove it, including the baud rate setting. It will look something like:
+
+console=serial0,115200
+
+* Make sure the rest of the line remains the same, as errors in this configuration can stop the Raspberry Pi from booting.
+
+* Reboot the Raspberry Pi for the change to take effect.
 
 
 ## Questions/Issues?

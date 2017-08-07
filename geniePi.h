@@ -33,17 +33,17 @@
 #define	GENIE_ACK		0x06
 #define	GENIE_NAK		0x15
 
-#define	GENIE_READ_OBJ				0
-#define	GENIE_WRITE_OBJ				1
-#define	GENIE_WRITE_STR				2
-#define	GENIE_WRITE_STRU			3
-#define	GENIE_WRITE_CONTRAST		4
-#define	GENIE_REPORT_OBJ			5
-#define	GENIE_REPORT_EVENT			7
-#define GENIE_MAGIC_BYTES			8
-#define GENIE_DOUBLE_BYTES 			9
+#define	GENIE_READ_OBJ				       0
+#define	GENIE_WRITE_OBJ				       1
+#define	GENIE_WRITE_STR				       2
+#define	GENIE_WRITE_STRU			       3
+#define	GENIE_WRITE_CONTRAST		     4
+#define	GENIE_REPORT_OBJ			       5
+#define	GENIE_REPORT_EVENT			     7
+#define GENIE_MAGIC_BYTES			       8
+#define GENIE_DOUBLE_BYTES 			     9
 #define GENIE_REPORT_MAGIC_BYTES  	10
-#define GENIE_REPORT_DOUBLE_BYTES	11
+#define GENIE_REPORT_DOUBLE_BYTES	  11
 
 
 // Objects
@@ -51,35 +51,33 @@
 //		Note: Object IDs may change with future releases; it is not
 //		advisable to code their values as constants.
 
-#define	GENIE_OBJ_DIPSW		 		0
-#define	GENIE_OBJ_KNOB		 		1
-#define	GENIE_OBJ_ROCKERSW	 		2
-#define	GENIE_OBJ_ROTARYSW	 		3		
-#define	GENIE_OBJ_SLIDER	 		4
-#define	GENIE_OBJ_TRACKBAR			5
-#define	GENIE_OBJ_WINBUTTON	 		6
-#define	GENIE_OBJ_ANGULAR_METER		7
-#define	GENIE_OBJ_COOL_GAUGE		8
-#define	GENIE_OBJ_CUSTOM_DIGITS		9
-#define	GENIE_OBJ_FORM				10
-#define	GENIE_OBJ_GAUGE				11
-#define	GENIE_OBJ_IMAGE				12
+#define	GENIE_OBJ_DIPSW		 		   0
+#define	GENIE_OBJ_KNOB		 		   1
+#define	GENIE_OBJ_ROCKERSW	 		 2
+#define	GENIE_OBJ_ROTARYSW	 		 3		
+#define	GENIE_OBJ_SLIDER	 		   4
+#define	GENIE_OBJ_TRACKBAR			 5
+#define	GENIE_OBJ_WINBUTTON	 		 6
+#define	GENIE_OBJ_ANGULAR_METER	 7
+#define	GENIE_OBJ_COOL_GAUGE		 8
+#define	GENIE_OBJ_CUSTOM_DIGITS	 9
+#define	GENIE_OBJ_FORM				  10
+#define	GENIE_OBJ_GAUGE				  11
+#define	GENIE_OBJ_IMAGE				  12
 #define	GENIE_OBJ_KEYBOARD			13
-#define	GENIE_OBJ_LED				14
+#define	GENIE_OBJ_LED				    14
 #define	GENIE_OBJ_LED_DIGITS		15
-#define	GENIE_OBJ_METER				16
-#define	GENIE_OBJ_STRINGS			17
+#define	GENIE_OBJ_METER				  16
+#define	GENIE_OBJ_STRINGS			  17
 #define	GENIE_OBJ_THERMOMETER		18
 #define	GENIE_OBJ_USER_LED			19
-#define	GENIE_OBJ_VIDEO				20
+#define	GENIE_OBJ_VIDEO				  20
 #define	GENIE_OBJ_STATIC_TEXT		21
-#define	GENIE_OBJ_SOUND				22
-#define	GENIE_OBJ_TIMER				23
-
-//June 20, 2014 TIME: 8:30AM PHTIME -->> Added New Objects for Visi-Genie Raspbery Pi Libraries
+#define	GENIE_OBJ_SOUND				  22
+#define	GENIE_OBJ_TIMER				  23
 #define	GENIE_OBJ_SPECTRUM			24
-#define	GENIE_OBJ_SCOPE				25
-#define	GENIE_OBJ_TANK				26
+#define	GENIE_OBJ_SCOPE				  25
+#define	GENIE_OBJ_TANK				  26
 #define	GENIE_OBJ_USERIMAGES		27
 #define	GENIE_OBJ_PINOUTPUT			28
 #define	GENIE_OBJ_PININPUT			29
@@ -87,6 +85,10 @@
 #define	GENIE_OBJ_ANIBUTTON			31
 #define	GENIE_OBJ_COLORPICKER		32
 #define	GENIE_OBJ_USERBUTTON		33
+// reserved for magic functions 34
+#define GENIE_OBJ_ISMARTGAUGE   35
+#define GENIE_OBJ_ISMARTSLIDER  36
+#define GENIE_OBJ_ISMARTKNOB    37
 
 
 // Structure to store replys returned from a display
