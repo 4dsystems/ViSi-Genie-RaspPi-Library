@@ -6,8 +6,9 @@
  *	on most Linux platforms with a serial connection (USB on
  *	on-board) to the 4D Systems Intelligent displays.
  *
- *	Gordon Henderson, December 2012, <projects@drogon.net>
- *	Copyright (c) 2012 4D Systems PTY Ltd, Sydney, Australia
+ *	Written by Gordon Henderson, December 2012, <projects@drogon.net>
+ *  Updated/Maintained by 4D Systems Pty Ltd, www.4dsystems.com.au
+ *	Copyright (c) 2020 4D Systems PTY Ltd, Sydney, Australia
  ***********************************************************************
  * This file is part of geniePi:
  *    geniePi is free software: you can redistribute it and/or modify
@@ -86,10 +87,45 @@
 #define	GENIE_OBJ_COLORPICKER		32
 #define	GENIE_OBJ_USERBUTTON		33
 // reserved for magic functions 34
-#define GENIE_OBJ_ISMARTGAUGE   35
-#define GENIE_OBJ_ISMARTSLIDER  36
-#define GENIE_OBJ_ISMARTKNOB    37
-
+#define GENIE_OBJ_SMARTGAUGE            35
+#define GENIE_OBJ_SMARTSLIDER           36
+#define GENIE_OBJ_SMARTKNOB             37
+// Not advisable to use the below 3, use the above 3 instead.
+#define GENIE_OBJ_ISMARTGAUGE           35 // Retained for backwards compatibility, however Users should use SMARTGAUGE instead of ISMARTGAUGE
+#define GENIE_OBJ_ISMARTSLIDER          36 // Retained for backwards compatibility, however Users should use SMARTSLIDER instead of ISMARTSLIDER
+#define GENIE_OBJ_ISMARTKNOB            37 // Retained for backwards compatibility, however Users should use SMARTKNOB instead of ISMARTKNOB
+// Comment end																																	  			  
+#define GENIE_OBJ_ILED_DIGITS_H         38
+#define GENIE_OBJ_IANGULAR_METER        39
+#define GENIE_OBJ_IGAUGE                40
+#define GENIE_OBJ_ILABEL                41
+#define GENIE_OBJ_IUSER_GAUGE           42
+#define GENIE_OBJ_IMEDIA_GAUGE          43
+#define GENIE_OBJ_IMEDIA_THERMOMETER    44
+#define GENIE_OBJ_ILED                  45
+#define GENIE_OBJ_IMEDIA_LED            46
+#define GENIE_OBJ_ILED_DIGITS_L         47
+#define GENIE_OBJ_ILED_DIGITS           47
+#define GENIE_OBJ_INEEDLE               48
+#define GENIE_OBJ_IRULER                49
+#define GENIE_OBJ_ILED_DIGIT            50
+#define GENIE_OBJ_IBUTTOND              51
+#define GENIE_OBJ_IBUTTONE              52
+#define GENIE_OBJ_IMEDIA_BUTTON         53
+#define GENIE_OBJ_ITOGGLE_INPUT         54
+#define GENIE_OBJ_IDIAL                 55
+#define GENIE_OBJ_IMEDIA_ROTARY         56
+#define GENIE_OBJ_IROTARY_INPUT         57
+#define GENIE_OBJ_ISWITCH               58
+#define GENIE_OBJ_ISWITCHB              59
+#define GENIE_OBJ_ISLIDERE              60
+#define GENIE_OBJ_IMEDIA_SLIDER         61
+#define GENIE_OBJ_ISLIDERH              62
+#define GENIE_OBJ_ISLIDERG              63
+#define GENIE_OBJ_ISLIDERF              64
+#define GENIE_OBJ_ISLIDERD              65
+#define GENIE_OBJ_ISLIDERC              66
+#define GENIE_OBJ_ILINEAR_INPUT         67
 
 // Structure to store replys returned from a display
 
@@ -111,6 +147,12 @@ struct genieMagicReplyStruct
   unsigned int data[100] ;
 } ;
 
+union FloatLongFrame {
+    float floatValue;
+    int32_t longValue;
+    uint32_t ulongValue;
+    int16_t wordValue[2];
+};
 
 // Globals (for debugging, mostly)
 
@@ -135,6 +177,9 @@ extern void genieGetReply      		(struct genieReplyStruct *reply) ;
 
 extern int  genieReadObj       		(int object, int index) ;
 extern int  genieWriteObj      		(int object, int index, unsigned int data) ;
+extern int  genieWriteShortToIntLedDigits   (int index, int16_t data);
+extern int  genieWriteLongToIntLedDigits    (int index, int32_t data);
+extern int  genieWriteFloatToIntLedDigits   (int index, float data);
 extern int  genieWriteContrast 		(int value) ;
 extern int  genieWriteStr      		(int index, char *string) ;
 

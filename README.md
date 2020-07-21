@@ -9,6 +9,16 @@ Library for the Raspberry Pi to allow easy communication between 4D Intelligent 
 
 This library is also required for the Raspberry Pi demo programs.
 
+## Genie Pi version 1.3 
+=======================================================
+*	Added the following function:
+
+	genieWriteShortToIntLedDigits   (int index, int16_t data)
+	genieWriteLongToIntLedDigits    (int index, int32_t data)
+	genieWriteFloatToIntLedDigits   (int index, float data)
+	
+*	Added numerous new objects to support Internal/Inherent Widgets in Workshop4	
+
 ## Genie Pi version 1.2 
 =======================================================
 *	Added the following function:

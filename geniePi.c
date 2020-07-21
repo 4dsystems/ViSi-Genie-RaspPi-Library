@@ -6,8 +6,9 @@
  *	on most Linux platforms with a serial connection (USB on
  *	on-board) to the 4D Systems Intelligent displays.
  *
- *	Gordon Henderson, December 2012, <projects@drogon.net>
- *	Copyright (c) 2012 4D Systems PTY Ltd, Sydney, Australia
+ *	Written by Gordon Henderson, December 2012, <projects@drogon.net>
+ *  Updated/Maintained by 4D Systems Pty Ltd, www.4dsystems.com.au
+ *	Copyright (c) 2020 4D Systems PTY Ltd, Sydney, Australia
  ***********************************************************************
  * This file is part of geniePi:
  *    geniePi is free software: you can redistribute it and/or modify
@@ -504,6 +505,7 @@ static int _genieWriteObj (int object, int index, unsigned int data)
 
   return 0 ;
 }
+
 int genieWriteObj (int object, int index, unsigned int data)
 {
   int result ;
@@ -515,6 +517,27 @@ int genieWriteObj (int object, int index, unsigned int data)
   return result ;
 }
 
+int genieWriteShortToIntLedDigits (int index, int16_t data) {
+    return genieWriteObj(GENIE_OBJ_ILED_DIGITS_L, index, data);
+}
+
+int genieWriteFloatToIntLedDigits (int index, float data) {
+    FloatLongFrame frame;
+    frame.floatValue = data;
+    int retval;
+    retval = genieWriteObj(GENIE_OBJ_ILED_DIGITS_H, index, frame.wordValue[1]);
+    if (retval != 1) return retval;
+    return genieWriteObj(GENIE_OBJ_ILED_DIGITS_L, index, frame.wordValue[0]);
+}
+
+int genieWriteLongToIntLedDigits (uint16_t index, int32_t data) {
+    FloatLongFrame frame;
+    frame.longValue = data;
+    int retval;
+    retval = genieWriteObj(GENIE_OBJ_ILED_DIGITS_H, index, frame.wordValue[1]);
+    if (retval != 1) return retval;
+    return genieWriteObj(GENIE_OBJ_ILED_DIGITS_L, index, frame.wordValue[0]);
+}
 
 /*
  * genieWriteContrast:
