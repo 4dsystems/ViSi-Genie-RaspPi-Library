@@ -45,7 +45,7 @@
 #define GENIE_DOUBLE_BYTES 			     9
 #define GENIE_REPORT_MAGIC_BYTES  	10
 #define GENIE_REPORT_DOUBLE_BYTES	  11
-
+#define	GENIE_WRITE_INH_LABEL       12
 
 // Objects
 //	the manual says:
@@ -99,6 +99,7 @@
 #define GENIE_OBJ_IANGULAR_METER        39
 #define GENIE_OBJ_IGAUGE                40
 #define GENIE_OBJ_ILABEL                41
+#define GENIE_OBJ_ILABELB               41
 #define GENIE_OBJ_IUSER_GAUGE           42
 #define GENIE_OBJ_IMEDIA_GAUGE          43
 #define GENIE_OBJ_IMEDIA_THERMOMETER    44
@@ -147,13 +148,6 @@ struct genieMagicReplyStruct
   unsigned int data[100] ;
 } ;
 
-union FloatLongFrame {
-    float floatValue;
-    int32_t longValue;
-    uint32_t ulongValue;
-    int16_t wordValue[2];
-};
-
 // Globals (for debugging, mostly)
 
 #ifdef	GENIE_DEBUG
@@ -181,14 +175,24 @@ extern int  genieWriteShortToIntLedDigits   (int index, int16_t data);
 extern int  genieWriteLongToIntLedDigits    (int index, int32_t data);
 extern int  genieWriteFloatToIntLedDigits   (int index, float data);
 extern int  genieWriteContrast 		(int value) ;
-extern int  genieWriteStr      		(int index, char *string) ;
 
-extern int  genieWriteStrHex 		(int index, long n);
-extern int  genieWriteStrDec 		(int index, long n);
-extern int  genieWriteStrOct 		(int index, long n);
-extern int  genieWriteStrBin 		(int index, long n);
+extern int  genieWriteStr      		(int index, char *string) ;
+extern int  genieWriteStrU     		(int index, char *string) ;
+extern int  genieWriteStrHex 		  (int index, long n);
+extern int  genieWriteStrDec 		  (int index, long n);
+extern int  genieWriteStrOct 		  (int index, long n);
+extern int  genieWriteStrBin 		  (int index, long n);
 extern int  genieWriteStrBase 		(int index, long n, int base);
 extern int  genieWriteStrFloat 		(int index, float n, int precision);
+
+extern int  genieWriteInhLabelDefault   (int index) ;
+extern int  genieWriteInhLabel          (int index, char *string) ;
+extern int  genieWriteInhLabelHex       (int index, long n);
+extern int  genieWriteInhLabelDec       (int index, long n);
+extern int  genieWriteInhLabelOct       (int index, long n);
+extern int  genieWriteInhLabelBin       (int index, long n);
+extern int  genieWriteInhLabelBase      (int index, long n, int base);
+extern int  genieWriteInhLabelFloat     (int index, float n, int precision);
 
 extern int  genieWriteMagicBytes	(int magic_index, unsigned int *byteArray) ;
 extern int  genieWriteDoubleBytes	(int magic_index, unsigned int *doubleByteArray) ;

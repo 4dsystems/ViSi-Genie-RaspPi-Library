@@ -27,6 +27,7 @@
  ***********************************************************************
  */
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <termios.h>
@@ -49,6 +50,13 @@
 #  define	TRUE (1==1)
 #  define	FALSE (1==0)
 #endif
+
+union FloatLongFrame {
+    float floatValue;
+    int32_t longValue;
+    uint32_t ulongValue;
+    int16_t wordValue[2];
+};
 
 // Input buffer:
 //	max. unprocessed replys from the display
@@ -522,7 +530,7 @@ int genieWriteShortToIntLedDigits (int index, int16_t data) {
 }
 
 int genieWriteFloatToIntLedDigits (int index, float data) {
-    FloatLongFrame frame;
+    union FloatLongFrame frame;
     frame.floatValue = data;
     int retval;
     retval = genieWriteObj(GENIE_OBJ_ILED_DIGITS_H, index, frame.wordValue[1]);
@@ -530,8 +538,8 @@ int genieWriteFloatToIntLedDigits (int index, float data) {
     return genieWriteObj(GENIE_OBJ_ILED_DIGITS_L, index, frame.wordValue[0]);
 }
 
-int genieWriteLongToIntLedDigits (uint16_t index, int32_t data) {
-    FloatLongFrame frame;
+int genieWriteLongToIntLedDigits (int index, int32_t data) {
+    union FloatLongFrame frame;
     frame.longValue = data;
     int retval;
     retval = genieWriteObj(GENIE_OBJ_ILED_DIGITS_H, index, frame.wordValue[1]);
@@ -608,6 +616,7 @@ static int _genieWriteStr (int index, char *string)
 
   return 0 ;
 }
+
 int genieWriteStr (int index, char *string)
 {
   int result ;
@@ -756,6 +765,144 @@ int genieWriteStrFloat (int index, float n, int precision)
   return result ;
 }
 
+int genieWriteInhLabelDefault (int index) {
+  return genieWriteObj(GENIE_OBJ_ILABELB, index, -1);
+}
+
+/*
+ * genieWriteInhLabel:
+ *	Write a string to a inherent label on the display
+ *********************************************************************************
+ */
+static int _genieWriteInhLabel (int index, char *string)
+{
+  char *p ;
+  unsigned int checksum ;
+  int len = strlen (string) ;
+
+  if (len > 255)
+    return -1 ;
+
+  genieAck = genieNak = FALSE ;
+
+  geniePutchar (GENIE_WRITE_INH_LABEL) ;    checksum  = GENIE_WRITE_INH_LABEL ;
+  geniePutchar (index) ;              checksum ^= index ;
+  geniePutchar ((unsigned char)len) ; checksum ^= len ;
+  for (p = string ; *p ; ++p)
+  {
+    geniePutchar (*p) ;
+    checksum ^= *p ;
+  }
+  geniePutchar (checksum) ;
+
+// TODO: Really ought to timeout here, but if the display doesn't
+//	respond, then it's probably game over anyway.
+
+  while ((genieAck == FALSE) && (genieNak == FALSE))
+    delay (1) ;
+
+  return 0 ;
+}
+
+int genieWriteInhLabel (int index, char *string)
+{
+  int result ;
+
+  pthread_mutex_lock   (&genieMutex) ;
+    result = _genieWriteInhLabel (index, string) ;
+  pthread_mutex_unlock (&genieMutex) ;
+
+  return result ;
+}
+
+/*
+ * genieWriteInhLabelDec:
+ *	Write a decimal value to the display (ASCII)
+ *	There is only one string type object.
+ *********************************************************************************
+ */
+static int _genieMakeInhLabel (int index, long n, int base)
+{
+	char buf[8 * sizeof(long) + 1]; // Assumes 8-bit chars plus zero byte.
+	char *str = &buf[sizeof(buf) - 1];			
+	int  neg = 0;
+	if(n < 0) neg = 1;
+	n = abs(n);
+
+	*str = '\0';			
+	do {
+		unsigned long m = n;
+		n /= base;
+		char c = m - base * n;
+		*--str = c < 10 ? c + '0' : c + 'A' - 10;				
+	} while(n);
+	if(neg) *--str = '-';		
+	_genieWriteInhLabel (index,str);	
+  return 0 ;
+}
+int genieWriteInhLabelHex (int index, long n)
+{
+  int result ;
+  pthread_mutex_lock   (&genieMutex) ;
+    result = _genieMakeInhLabel (index, n, 16);
+  pthread_mutex_unlock (&genieMutex) ;
+  return result ;
+}
+int genieWriteInhLabelOct (int index, long n)
+{
+  int result ;
+  pthread_mutex_lock   (&genieMutex) ;
+    result = _genieMakeInhLabel (index, n, 8);
+  pthread_mutex_unlock (&genieMutex) ;
+  return result ;
+}
+int genieWriteInhLabelBin (int index, long n)
+{
+  int result ;
+  pthread_mutex_lock   (&genieMutex) ;
+    result = _genieMakeInhLabel (index, n, 2);
+  pthread_mutex_unlock (&genieMutex) ;
+  return result ;
+}
+int genieWriteInhLabelBase (int index, long n, int base)
+{
+  int result ;
+  pthread_mutex_lock   (&genieMutex) ;
+    result = _genieMakeInhLabel (index, n, base);
+  pthread_mutex_unlock (&genieMutex) ;
+  return result ;
+}
+int genieWriteInhLabelDec (int index, long n)
+{
+
+  int result ;
+  pthread_mutex_lock   (&genieMutex) ;
+    result = _genieMakeInhLabel (index, n, 10);
+  pthread_mutex_unlock (&genieMutex) ;
+  return result ;
+}
+
+/*
+ * genieWriteInhLabelFloat:
+ *	Write a float string to the display.
+ *	There is only one byte per index in array.
+ *********************************************************************************
+ */
+static int _genieWriteInhLabelFloat (int index, float n, int precision)
+{  
+  char str[sizeof(long)];
+  gcvt(n, precision, str);  
+  _genieWriteInhLabel(index, str);
+  return 0;
+}
+int genieWriteInhLabelFloat (int index, float n, int precision)
+{  
+  int result ;
+  pthread_mutex_lock   (&genieMutex) ;
+     result = _genieWriteInhLabelFloat (index,n,precision);
+  pthread_mutex_unlock (&genieMutex) ;
+  return result ;
+}
 
 /*
  * genieWriteMagicBytes:
@@ -767,7 +914,8 @@ static int  _genieWriteMagicBytes	(int magic_index, unsigned int *byteArray)
 {
 	unsigned int *p ;
 	unsigned int checksum ;
-	int len = sizeof(byteArray) / sizeof(byteArray[0]);
+	int len = sizeof(byteArray) / sizeof(int);
+//	int len = sizeof(byteArray) / sizeof(byteArray[0]);
 
 	if (len > 255)
 		return -1 ;
@@ -813,7 +961,8 @@ static int  _genieWriteDoubleBytes	(int magic_index,unsigned int *doubleByteArra
 {
 	unsigned int *p ;
 	unsigned int checksum ;
-	int len = sizeof (doubleByteArray) / sizeof(doubleByteArray[0]);
+	int len = sizeof (doubleByteArray) / sizeof(int);
+	// int len = sizeof (doubleByteArray) / sizeof(doubleByteArray[0]);
 
 	if (len > 255)
 		return -1 ;

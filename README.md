@@ -1,7 +1,7 @@
 ![image](http://www.4dsystems.com.au/downloads/4DLogo.png)
 
 ViSi-Genie-RaspPi-Library
-====================
+=========================
 
 4D Systems Raspberry Pi Library for Visi-Genie
 
@@ -10,7 +10,7 @@ Library for the Raspberry Pi to allow easy communication between 4D Intelligent 
 This library is also required for the Raspberry Pi demo programs.
 
 ## Genie Pi version 1.3 
-=======================================================
+-----
 *	Added the following function:
 
 	genieWriteShortToIntLedDigits   (int index, int16_t data)
@@ -20,7 +20,7 @@ This library is also required for the Raspberry Pi demo programs.
 *	Added numerous new objects to support Internal/Inherent Widgets in Workshop4	
 
 ## Genie Pi version 1.2 
-=======================================================
+-----
 *	Added the following function:
 
 	genieWriteStrHex	(int index, long n)
@@ -31,7 +31,7 @@ This library is also required for the Raspberry Pi demo programs.
 	genieWriteStrFloat	(int index, float n, int precision)
 	
 ## Genie Pi version 1.1 
-=======================================================
+-----
 *	Added the following function:	
 	genieWriteMagicBytes	(int magic_index, unsigned int *byteArray) 
 	genieWriteDoubleBytes	(int magic_index, unsigned int *doubleByteArray)
@@ -39,69 +39,63 @@ This library is also required for the Raspberry Pi demo programs.
 * 	Added additional Struct : 
 		genieMagicReplyStruct :	cmd, index, length, data[100]	
 
-		
-		
+## Dependencies
+-----
+This section discusses the package requirements of the library
 
-## Installation of Genie Pi Library on the Raspberry Pi
-=======================================================
+### WiringPi
 
-  make
+* Connect your Raspberry Pi up to the Internet and install wiringPi:
+	```  
+	sudo apt install wiringpi
+	```
 
-  sudo make install
+* Please see here for more details (https://projects.drogon.net/raspberry-pi/wiringpi/download-and-install/)
 
-## To Uninstall Genie Pi Library
-=================================
 
-  sudo make uninstall
-  
+## Installation
+-----
+This section discusses install and uninstall procedure for Genie Pi
 
-## To Install wiringPi library (Required for some applications/demos)
-=====================================================================
-* Connect your raspberry Pi up to the Internet and download WiringPi library from github:
-  
-  
-  cd
-  
-  git clone git://git.drogon.net/wiringPi
-  
-  cd wiringPi
-  
-  ./build
-  
-  
-* This will then download and install the wiringPi library, assuming you have git installed on your Raspberry Pi already.
+### Install Genie Pi Library
+```
+make
+sudo make install
+```
 
-* If you encounter an error such as: error while loading shared libraries: libgeniePi.so: cannot open shared object file: No such file or directory
-do the following:
+### Uninstall Genie Pi Library
+```
+sudo make uninstall
+```  
 
-  sudo ldconfig -v
+## Setup Raspberry Pi Serial UART hardware
+-----
 
-This should solve the problem
+* In a default install of Raspbian, the primary UART is assigned to the Linux console. Using the serial port for other purposes requires this default behavour to be changed. On startup, systemd checks the Linux Kernal command line for any console entries, and will use the console defined therein. To stop this behavour, the serial console setting needs to be removed from the command line.
 
-* Please see here for more detail if you need to install git also (https://projects.drogon.net/raspberry-pi/wiringpi/download-and-install/)
-  
-
-## Disable Linux from using the Pi Serial Port so the GeniePi library can instead
-=================================================================================
-* In a default install of Raspbian, the primary UART (serial0) is assigned to the Linux console. Using the serial port for other purposes requires this default behavour to be changed. On startup, systemd checks the Linux Kernal command line for any console entries, and will use the console defined therein. To stop this behavour, the serial console setting needs to be removed from the command line.
 * This can be done by using the raspi-config utility, or manually.
+	```
+	sudo raspi-config
+	```
 
-  sudo raspi-config
+* Select **Interfacing options**, then option **Serial**
 
-* Select option 5, interfacing options, then option P6, Serial, and then select No. Exit Raspi-config.
+* Select **No** to disable Console via Serial
+
+* Select **Yes** to enable Serial hardware
+
+* Exit Raspberry Pi Configuration
 
 * To manually change the settings, edit the kernel command line with:
+	```
+	sudo nano /boot/cmdline.txt
+	```
 
-  sudo nano /boot/cmdline.txt
-
-* Find the console entry the refers to the serial0 device, and remove it, including the baud rate setting. It will look something like:
-
-  console=serial0,115200
+* Find the console entry the refers to the serial0 device, and remove it, including the baud rate setting. It will look something like: ```console=serial0,115200```
 
 * Make sure the rest of the line remains the same, as errors in this configuration can stop the Raspberry Pi from booting.
 
 * Reboot the Raspberry Pi for the change to take effect.
-
 
 ## Questions/Issues?
 
